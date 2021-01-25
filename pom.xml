@@ -1,10 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.github.uzrnem</groupId>
+	<artifactId>verify</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>verify</name>
+	<description>Create Java8 Validator and Check library for Request object and Variables with lightweight code and annotation free</description>
+	<properties>
+		<java.version>1.8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 
-    <groupId>com.github.uzrnem</groupId>
-    <artifactId>verify</artifactId>
-    <version>0.0.1</version>
     <build>
         <plugins>
             <plugin>
@@ -30,10 +37,6 @@
         </plugins>
     </build>
     <packaging>jar</packaging>
-
-    <name>Validation Library</name>
-    <description>This is library for validation in Java 8. we want to keep it as lightweight as possible.
-    </description>
     <url>http://github.com/uzrnem/verify</url>
 
     <licenses>
@@ -107,7 +110,7 @@
     <scm>
         <connection>scm:git:git://github.com/uzrnem/verify.git</connection>
         <developerConnection>scm:git:ssh://github.com:uzrnem/verify.git</developerConnection>
-        <url>http://github.com/uzrnem/verify</url>
+        <url>http://github.com/uzrnem/verify.git</url>
     </scm>
 
     <developers>
@@ -119,10 +122,6 @@
         </developer>
     </developers>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -131,6 +130,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-
 </project>
