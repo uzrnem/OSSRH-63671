@@ -2,15 +2,26 @@ gpg
 gpg --full-generate-key
 gpg --list-keys
 gpg --export --armor KEYSTOBEUPLOADED
-gpg -ab verify-1.0.1.jar
-gpg -ab verify-1.0.1.pom
-gpg -ab Validator.java
 
-mvn -Dtest=com.github.uzrnem.verify.ValidatorTest test
-mvn versions:set -DnewVesions 1.0.0
+mvn versions:set -DnewVesions
+mvn clean install
+mvn javadoc:jar source:jar
+cd verify/src/main/java/com/github/uzrnem/verify
+gpg -ab All.java
 mvn clean deploy
-~/Documents/sts-workspace/j-validator/target/nexus-staging/deferred/com/github/uzrnem/verify/1.0.3$
-gpg -ab verify-1.0.1.jar
-gpg -ab verify-1.0.1.pom
 
+cd target
+target$ gpg -ab verify-0.0.1-SNAPSHOT-javadoc.jar
+target$ gpg -ab verify-0.0.1-SNAPSHOT.jar
+$ gpg -ab pom.xml
+
+mvn clean deploy
 mvn clean deploy -P release
+
+git push origin
+mvn release:perform
+mvn nexus-staging:release
+
+
+mvn javadoc:jar source:jar repository:bundle-create
+https://oss.sonatype.org/#staging-upload
