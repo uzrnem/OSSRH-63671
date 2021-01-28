@@ -5,7 +5,7 @@ https://search.maven.org/artifact/com.github.uzrnem/verify/1.0.2/jar
 <dependency>
   <groupId>com.github.uzrnem</groupId>
   <artifactId>verify</artifactId>
-  <version>1.0.0</version>
+  <version>0.0.1</version>
 </dependency>
 ```
 
