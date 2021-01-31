@@ -5,9 +5,11 @@ https://search.maven.org/artifact/com.github.uzrnem/verify/1.0.2/jar
 <dependency>
   <groupId>com.github.uzrnem</groupId>
   <artifactId>verify</artifactId>
-  <version>0.0.1</version>
+  <version>0.0.2</version>
 </dependency>
 ```
+
+Before starting please go through Test cases provided.
 
 You can create your Validator<T> with POJO
 ```
@@ -27,10 +29,19 @@ class Model {
     .max(Model::getLastName, 10, "Last name is invalid")
     .max(Model::getAge, 55, "Employee age limit is reached")
     .min(Model::getSalary, 10000, "Salary can't be less than 10000")
-    .in(Model::getLastName, Arrays.asList("Larry", "Moe", "curly"), "Last name is not expected");
+    .in(Model::getLastName, Arrays.asList("Larry", "Moe", "curly"), "Last name is not expected")
+    .notIn(Model::getFirstName, Arrays.asList("Thonas", "Loki"), "You are villan")
+    .check(Model::getLastName, l -> l.startsWith("c"), "Last name is not C.lassy");
 }
-
-
+```
+#Lets talk about functions by Validator
+1. add(): you can add here checks(ALPHABETIC, ALPHANUMERIC, NUMERIC, UPPERCASE, LOWERCASE, REQUIRED, EMAIL) with `or` operator
+2. min(): you can check min for String and Integer values
+3. max(): you can check max for String and Integer values
+4. in(): you need to provide list and check given value is provided in list.
+4. notIn(): you need to provide list and check given value is provided not in list.
+5. check(): you can provide your own Predicate function and say validate using this.
+```
 Model m = new Model();
 m.setFirstName("Greta");
 m.setLastName("Thunderburg");

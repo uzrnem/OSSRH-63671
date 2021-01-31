@@ -33,6 +33,7 @@ package com.github.uzrnem.verify;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class Validator<T> {
 	public static final int ALPHABETIC = 0x00000001;
@@ -49,6 +50,8 @@ public class Validator<T> {
 	private static final int TYPE_MIN = 2;
 	private static final int TYPE_MAX = 3;
 	private static final int TYPE_CONTAINS = 4;
+	private static final int TYPE_NOT_CONTAINS = 5;
+	private static final int TYPE_CUSTOM = 6;
 	private List<Validator.Rules> rulesList = null;
 	private List<String> errors = null;
 	private java.util.function.Consumer<Object> sop = Validator::println; //System.out::println; //
@@ -75,27 +78,37 @@ public class Validator<T> {
 	private static void println(Object str) {
 	}
 
-	public <C> Validator<T> add(Function<T, C> bID, Integer flags, String error) {
-		this.getValidateRules().add(new Rules().withFunc(bID).withType(Validator.TYPE_NORMAL).withFlags(flags).withErrorMsg(error));
+	public <C> Validator<T> add(Function<T, C> getVal, Integer flags, String error) {
+		this.getValidateRules().add(new Rules().withValFunc(getVal).withType(Validator.TYPE_NORMAL).withFlags(flags).withErrorMsg(error));
 		return this;
 	}
 
-	public <C> Validator<T> min(Function<T, C> bID, int limit, String error) {
-		this.getValidateRules().add(new Rules().withFunc(bID).withType(Validator.TYPE_MIN).withLimit(limit).withErrorMsg(error));
+	public <C> Validator<T> min(Function<T, C> getVal, int limit, String error) {
+		this.getValidateRules().add(new Rules().withValFunc(getVal).withType(Validator.TYPE_MIN).withLimit(limit).withErrorMsg(error));
 		return this;
 	}
 
-	public <C> Validator<T> max(Function<T, C> bID, int limit, String error) {
-		this.getValidateRules().add(new Rules().withFunc(bID).withType(Validator.TYPE_MAX).withLimit(limit).withErrorMsg(error));
+	public <C> Validator<T> max(Function<T, C> getVal, int limit, String error) {
+		this.getValidateRules().add(new Rules().withValFunc(getVal).withType(Validator.TYPE_MAX).withLimit(limit).withErrorMsg(error));
 		return this;
 	}
 
-	public <C> Validator<T> in(Function<T, C> bID, List<C> asList, String error) {
-		this.getValidateRules().add(new Rules().withFunc(bID).withType(Validator.TYPE_CONTAINS).withListIn(asList).withErrorMsg(error));
+	public <C> Validator<T> in(Function<T, C> getVal, List<C> asList, String error) {
+		this.getValidateRules().add(new Rules().withValFunc(getVal).withType(Validator.TYPE_CONTAINS).withListIn(asList).withErrorMsg(error));
 		return this;
 	}
 
-	public Boolean checkFlag(Integer rules, Integer flag) {
+	public <C> Validator<T> notIn(Function<T, C> getVal, List<C> asList, String error) {
+		this.getValidateRules().add(new Rules().withValFunc(getVal).withType(Validator.TYPE_NOT_CONTAINS).withListIn(asList).withErrorMsg(error));
+		return this;
+	}
+
+	public <C> Validator<T> check(Function<T, C> getVal, Predicate<C> isTrue, String error) {
+		this.getValidateRules().add(new Rules().withValFunc(getVal).withType(Validator.TYPE_CUSTOM).withCheckFunc(isTrue).withErrorMsg(error));
+		return this;
+	}
+
+	protected Boolean checkFlag(Integer rules, Integer flag) {
 		return (rules & flag) == flag;
 	}
 
@@ -103,7 +116,7 @@ public class Validator<T> {
 		this.getErrors().clear();
 
 		this.getValidateRules().forEach(rules -> {
-			Object value = rules.getFunc().apply(m);
+			Object value = rules.getValFunc().apply(m);
 			sop.accept(value);
 			switch (rules.getType()) {
 			case Validator.TYPE_NORMAL: {
@@ -167,6 +180,18 @@ public class Validator<T> {
 				}
 				break;
 			}
+			case Validator.TYPE_NOT_CONTAINS: {
+				if (rules.getListIn().contains(value)) {
+					this.getErrors().add(rules.getErrorMsg());
+				}
+				break;
+			}
+			case Validator.TYPE_CUSTOM: {
+				if (!rules.getCheckFunc().test(value)) {
+					this.getErrors().add(rules.getErrorMsg());
+				}
+				break;
+			}
 			default:
 				break;
 			}
@@ -175,19 +200,20 @@ public class Validator<T> {
 	}
 
 	static class Rules {
-		private Function func;
-		private Integer flags;
-		private Integer type;
-		private Integer limit;
-		private List listIn;
-		private String errorMsg;
+		private Function valFunc; //get value from object
+		private Integer flags; //If type is normal then we have flags, for uppercase lowercase alpha numeric email
+		private Integer type; //TYPE_NORMAL MIN MAX CONTAINS CUSTOM 
+		private Integer limit; //provide lower or higher limit for Integer and String
+		private List listIn; //if given value must be provided in list
+		private String errorMsg; //simple error message
+		private Predicate checkFunc; //get custom function to validate
 
-		public Function getFunc() {
-			return func;
+		public Function getValFunc() {
+			return valFunc;
 		}
 
-		public Rules withFunc(Function func) {
-			this.func = func;
+		public Rules withValFunc(Function valFunc) {
+			this.valFunc = valFunc;
 			return this;
 		}
 
@@ -233,6 +259,15 @@ public class Validator<T> {
 
 		public Rules withErrorMsg(String errorMsg) {
 			this.errorMsg = errorMsg;
+			return this;
+		}
+
+		public Predicate getCheckFunc() {
+			return checkFunc;
+		}
+
+		public Rules withCheckFunc(Predicate checkFunc) {
+			this.checkFunc = checkFunc;
 			return this;
 		}
 	}

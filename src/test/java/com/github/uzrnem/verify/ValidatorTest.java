@@ -1,6 +1,7 @@
 package com.github.uzrnem.verify;
 
 import java.util.Arrays;
+import java.util.function.Function;
 
 import junit.framework.TestCase;
 
@@ -9,13 +10,15 @@ public class ValidatorTest extends TestCase {
 	public void test() {
 
 		Model m = new Model();
-		m.setFirstName("Greta");
+		m.setFirstName("Loki");
 		m.setLastName("Thunderburg");
 		m.setAge(60);
 		m.setSalary(9000);
 		assertFalse(Model.validator.test(m));
+		
+		Model.validator.getErrors().stream().map(Function.identity()).forEach(System.out::println);
 
-		assertEquals(Model.validator.getErrors().size(), 6);
+		assertTrue(Model.validator.getErrors().size() > 0);
 
 		m.setFirstName("GRETA");
 		m.setLastName("curly");
@@ -70,6 +73,9 @@ public class ValidatorTest extends TestCase {
 				.max(Model::getLastName, 10, "Last name is invalid")
 				.max(Model::getAge, 55, "Employee age limit is reached")
 				.min(Model::getSalary, 10000, "Salary can't be less than 10000")
-				.in(Model::getLastName, Arrays.asList("Larry", "Moe", "curly"), "Last name is not expected");
+				.in(Model::getLastName, Arrays.asList("Larry", "Moe", "curly"), "Last name is not expected")
+				.notIn(Model::getFirstName, Arrays.asList("Thonas", "Loki"), "You are villan")
+				.check(Model::getLastName, l -> l.startsWith("c"), "Last name is not C.lassy")
+				;
 	}
 }
