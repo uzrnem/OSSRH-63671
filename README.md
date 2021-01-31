@@ -1,6 +1,6 @@
 # validator
 Add Dependency to your maven project
-https://search.maven.org/artifact/com.github.uzrnem/verify/1.0.2/jar
+https://search.maven.org/artifact/com.github.uzrnem/verify/0.0.2/jar
 ```
 <dependency>
   <groupId>com.github.uzrnem</groupId>
